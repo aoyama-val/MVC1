@@ -15,29 +15,17 @@ namespace MVC1
 
         public BmiController(Form1 form)
         {
+            this.model = new BmiModel();
+
             this.form = form;
-            this.model = new BmiModel()
-            {
-                Height = 178,
-                Weight = 76
-            };
-           
-            this.model.HeightChanged += (sender, args) =>
-            {
-                var bmi = this.model.Calc();
-                this.form.ShowBmi(bmi);
-            };
+            this.form.TxtHeight.TextChanged += this.OnHeightChangedByUser;
+            this.form.TxtWeight.TextChanged += this.OnWeightChangedByUser;
 
-            this.model.WeightChanged += (sender, args) =>
-            {
-                var bmi = this.model.Calc();
-                this.form.ShowBmi(bmi);
-            };
+            this.form.Model = this.model;
 
-            var initialBmi = this.model.Calc();
-            this.form.ShowHeight(this.model.Height);
-            this.form.ShowWeight(this.model.Weight);
-            this.form.ShowBmi(initialBmi);
+            this.model.Height = 178;
+            this.model.Weight = 76;
+            this.model.Calc();
         }
 
         public void OnHeightChangedByUser(Object sender, EventArgs args)
@@ -45,7 +33,13 @@ namespace MVC1
             TextBox tb = (TextBox)sender;
             var strHeight = tb.Text;
             Debug.WriteLine($"height = {strHeight}");
-            this.model.SetHeightByString(strHeight);
+
+            double height;
+            if (double.TryParse(strHeight, out height))
+            {
+                this.model.Height = height;
+            }
+            this.model.Calc();
         }
 
         public void OnWeightChangedByUser(Object sender, EventArgs args)
@@ -53,7 +47,13 @@ namespace MVC1
             TextBox tb = (TextBox)sender;
             var strWeight = tb.Text;
             Debug.WriteLine($"weight = {strWeight}");
-            this.model.SetWeightByString(strWeight);
+
+            double weight;
+            if (double.TryParse(strWeight, out weight))
+            {
+                this.model.Weight = weight;
+            }
+            this.model.Calc();
         }
     }
 }

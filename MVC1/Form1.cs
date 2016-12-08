@@ -15,25 +15,47 @@ namespace MVC1
     public partial class Form1 : Form
     {
         BmiController controller;
+        BmiModel model;
+
+        public TextBox TxtHeight { get { return this.txtHeight; } }
+        public TextBox TxtWeight { get { return this.txtWeight; } }
+        public TextBox TxtBmi { get { return this.txtBmi; } }
 
         public Form1()
         {
             InitializeComponent();
-
             this.controller = new BmiController(this);
-
-            this.txtHeight.TextChanged += new EventHandler(this.controller.OnHeightChangedByUser);
-            this.txtWeight.TextChanged += new EventHandler(this.controller.OnWeightChangedByUser);
         }
 
-        public void ShowHeight(double height)
+        public BmiModel Model
         {
-            this.txtHeight.Text = height.ToString("F2");
-        }
-
-        public void ShowWeight(double weight)
-        {
-            this.txtWeight.Text = weight.ToString("F2");
+            get { return this.model; }
+            set
+            {
+                this.model = value;
+                this.model.PropertyChanged += (sender, args) =>
+                {
+                    if (args.PropertyName == "Height")
+                    {
+                        Debug.WriteLine("Height changed");
+                        double d;
+                        if (!(double.TryParse(this.txtHeight.Text, out d) && d == this.model.Height))
+                            this.txtHeight.Text = this.model.Height.ToString("F2");
+                    }
+                    else if (args.PropertyName == "Weight")
+                    {
+                        Debug.WriteLine("Weight changed");
+                        double d;
+                        if (!(double.TryParse(this.txtWeight.Text, out d) && d == this.model.Weight))
+                            this.txtWeight.Text = this.model.Weight.ToString("F2");
+                    }
+                    else if (args.PropertyName == "Bmi")
+                    {
+                        Debug.WriteLine("Bmi changed");
+                        this.ShowBmi(this.model.Bmi);
+                    }
+                };
+            }
         }
 
         public void ShowBmi(double bmi)
